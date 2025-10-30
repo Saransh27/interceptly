@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interceptly - Development</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .dev-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .dev-header {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dev-header h1 {
+      color: #3b82f6;
+      margin-bottom: 10px;
+    }
+    
+    .dev-header p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .dev-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .dev-btn {
+      padding: 8px 16px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .dev-btn:hover {
+      background: #2563eb;
+    }
+    
+    .dev-btn.secondary {
+      background: #6b7280;
+    }
+    
+    .dev-btn.secondary:hover {
+      background: #4b5563;
+    }
+    
+    .dev-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .dev-panel {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .dev-panel-header {
+      background: #f9fafb;
+      padding: 15px;
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 600;
+      color: #374151;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .dev-panel-content {
+      padding: 20px;
+      height: 500px;
+      overflow-y: auto;
+      border: 2px solid #f3f4f6;
+    }
+    
+    .dev-log {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      color: #374151;
+      line-height: 1.6;
+    }
+    
+    .dev-log-entry {
+      margin-bottom: 8px;
+      padding: 8px;
+      background: #f9fafb;
+      border-left: 3px solid #3b82f6;
+      border-radius: 2px;
+    }
+    
+    .dev-log-entry.error {
+      border-left-color: #ef4444;
+      color: #dc2626;
+    }
+    
+    .dev-log-entry.success {
+      border-left-color: #10b981;
+      color: #059669;
+    }
+    
+    .dev-log-entry.warning {
+      border-left-color: #f59e0b;
+      color: #d97706;
+    }
+    
+    .dev-log-time {
+      color: #9ca3af;
+      font-size: 11px;
+      margin-right: 8px;
+    }
+    
+    @media (max-width: 768px) {
+      .dev-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dev-container">
+    <div class="dev-header">
+      <h1>🚀 Interceptly Development Environment</h1>
+      <p>Test and develop the extension with hot reload and mocked Chrome API</p>
+      <div class="dev-controls">
+        <button class="dev-btn" onclick="openPopup()">View Popup</button>
+        <button class="dev-btn" onclick="openOptions()">View Rules Manager</button>
+        <button class="dev-btn secondary" onclick="clearLogs()">Clear Logs</button>
+      </div>
+    </div>
+    
+    <div class="dev-grid">
+      <div class="dev-panel">
+        <div class="dev-panel-header">📱 Preview</div>
+        <div class="dev-panel-content" id="preview">
+          <p style="color: #9ca3af; text-align: center; padding-top: 200px;">
+            Click "View Popup" or "View Rules Manager" above to preview components
+          </p>
+        </div>
+      </div>
+      
+      <div class="dev-panel">
+        <div class="dev-panel-header">📋 Console Logs</div>
+        <div class="dev-panel-content dev-log" id="logs">
+          <div class="dev-log-entry success">
+            <span class="dev-log-time">00:00:00</span>
+            ✓ Development environment initialized
+          </div>
+          <div class="dev-log-entry success">
+            <span class="dev-log-time">00:00:00</span>
+            ✓ Chrome API mocked successfully
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Mock Chrome API
+    const mockRules = [
+      {
+        id: '1',
+        type: 'redirect',
+        urlPattern: '*://api.example.com/*',
+        enabled: true,
+        priority: 1,
+        action: { type: 'redirect', redirect: { url: 'http://localhost:3000/' } },
+        createdAt: Date.now() - 86400000,
+        updatedAt: Date.now() - 86400000,
+      },
+      {
+        id: '2',
+        type: 'block',
+        urlPattern: '*://ads.com/*',
+        enabled: true,
+        priority: 2,
+        action: { type: 'block' },
+        createdAt: Date.now() - 172800000,
+        updatedAt: Date.now() - 172800000,
+      },
+      {
+        id: '3',
+        type: 'redirect',
+        urlPattern: '*://old-domain.com/*',
+        enabled: false,
+        priority: 3,
+        action: { type: 'redirect', redirect: { url: 'https://new-domain.com/' } },
+        createdAt: Date.now() - 259200000,
+        updatedAt: Date.now() - 259200000,
+      },
+    ];
+
+    let storageChangeListeners = [];
+
+    window.chrome = {
+      storage: {
+        sync: {
+          get: async (key) => {
+            addLog('chrome.storage.sync.get called', 'success', key);
+            if (key === 'interceptly_rules') {
+              return { interceptly_rules: mockRules };
+            }
+            if (key === 'interceptly_enabled') {
+              return { interceptly_enabled: true };
+            }
+            return {};
+          },
+          set: async (obj) => {
+            addLog('chrome.storage.sync.set called', 'success', JSON.stringify(obj));
+            if (obj.interceptly_rules) {
+              mockRules.length = 0;
+              mockRules.push(...obj.interceptly_rules);
+            }
+            // Trigger change listeners
+            storageChangeListeners.forEach(callback => {
+              callback({ ...obj }, 'sync');
+            });
+          },
+        },
+        onChanged: {
+          addListener: (callback) => {
+            addLog('chrome.storage.onChanged listener added', 'success');
+            storageChangeListeners.push(callback);
+          },
+        },
+      },
+      runtime: {
+        sendMessage: async (request) => {
+          addLog('chrome.runtime.sendMessage called', 'success', JSON.stringify(request));
+          if (request.action === 'getRules') {
+            return { rules: mockRules, enabled: true };
+          }
+          if (request.action === 'toggleExtension') {
+            addLog('Extension toggled', 'success');
+            return { enabled: true };
+          }
+          return {};
+        },
+        openOptionsPage: () => {
+          addLog('chrome.runtime.openOptionsPage called', 'success');
+          openOptions();
+        },
+        onMessage: {
+          addListener: (callback) => {
+            addLog('chrome.runtime.onMessage listener added', 'success');
+          },
+        },
+      },
+    };
+
+    // Logging utilities
+    function addLog(message, type = 'log', details = '') {
+      const logsContainer = document.getElementById('logs');
+      const timestamp = new Date().toLocaleTimeString('en-US', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+
+      const entry = document.createElement('div');
+      entry.className = `dev-log-entry ${type}`;
+      
+      let icon = '•';
+      if (type === 'success') icon = '✓';
+      if (type === 'error') icon = '✕';
+      if (type === 'warning') icon = '⚠';
+
+      entry.innerHTML = `
+        <span class="dev-log-time">${timestamp}</span>
+        ${icon} ${message}
+        ${details ? `<br><span style="margin-left: 70px; color: #9ca3af; font-size: 11px;">${details}</span>` : ''}
+      `;
+      
+      logsContainer.appendChild(entry);
+      logsContainer.scrollTop = logsContainer.scrollHeight;
+    }
+
+    window.addLog = addLog;
+
+    // Preview functions
+    window.openPopup = async () => {
+      const preview = document.getElementById('preview');
+      preview.innerHTML = '<iframe src="/src/popup/popup.html" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>';
+      addLog('Popup preview opened', 'success');
+    };
+
+    window.openOptions = async () => {
+      const preview = document.getElementById('preview');
+      preview.innerHTML = '<iframe src="/src/options/options.html" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>';
+      addLog('Options preview opened', 'success');
+    };
+
+    window.clearLogs = () => {
+      document.getElementById('logs').innerHTML = '';
+      addLog('Logs cleared', 'warning');
+    };
+
+    // Intercept console logs
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+
+    console.log = function(...args) {
+      originalLog(...args);
+      addLog(args.join(' '), 'log');
+    };
+
+    console.error = function(...args) {
+      originalError(...args);
+      addLog(args.join(' '), 'error');
+    };
+
+    console.warn = function(...args) {
+      originalWarn(...args);
+      addLog(args.join(' '), 'warning');
+    };
+
+    addLog('✨ Development environment ready!', 'success');
+    addLog('Mock rules loaded: ' + mockRules.length + ' rules', 'success');
+  </script>
+</body>
+</html>
