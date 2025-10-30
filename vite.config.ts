@@ -8,12 +8,35 @@ const __dirname = path.resolve()
 // Custom plugin to copy manifest.json
 const copyManifestPlugin = {
   name: 'copy-manifest',
+  apply: 'build' as const,
+  enforce: 'post' as const,
+  generateBundle() {
+    try {
+      const src = path.resolve(__dirname, 'manifest.json')
+      
+      if (fs.existsSync(src)) {
+        const content = fs.readFileSync(src, 'utf-8')
+        this.emitFile({
+          type: 'asset',
+          fileName: 'manifest.json',
+          source: content,
+        })
+        console.log('✓ manifest.json will be emitted')
+      }
+    } catch (err) {
+      console.error('✗ Error preparing manifest:', err)
+    }
+  },
   writeBundle() {
-    const src = path.resolve(__dirname, 'manifest.json')
-    const dest = path.resolve(__dirname, 'dist/manifest.json')
-    if (fs.existsSync(src)) {
-      fs.copyFileSync(src, dest)
-      console.log('✓ manifest.json copied to dist/')
+    try {
+      const src = path.resolve(__dirname, 'manifest.json')
+      const dest = path.resolve(__dirname, 'dist/manifest.json')
+      if (fs.existsSync(src)) {
+        fs.copyFileSync(src, dest)
+        console.log('✓ manifest.json copied to dist/')
+      }
+    } catch (err) {
+      console.error('✗ Error copying manifest:', err)
     }
   },
 }
@@ -42,5 +65,8 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  ssr: {
+    noExternal: true,
   },
 })

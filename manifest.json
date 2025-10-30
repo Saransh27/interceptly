@@ -1,5 +1,11 @@
 {
   "manifest_version": 3,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "interceptly@saransh27.dev",
+      "strict_min_version": "109.0"
+    }
+  },
   "name": "Interceptly - Request Interceptor",
   "version": "1.0.0",
   "description": "Intercept, modify, and redirect HTTP/HTTPS requests with powerful rules",

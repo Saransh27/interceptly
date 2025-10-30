@@ -28,6 +28,8 @@ function OptionsApp() {
   }
 
   const handleAddRule = async () => {
+    console.log('Add rule clicked, newRule:', newRule)
+    
     if (!newRule.urlPattern) {
       alert('Please enter a URL pattern')
       return
@@ -46,8 +48,12 @@ function OptionsApp() {
       updatedAt: Date.now(),
     }
 
+    console.log('New rule object:', rule)
+
     try {
+      console.log('Attempting to add rule...')
       await StorageUtils.addRule(rule)
+      console.log('Rule added successfully')
       setRules([...rules, rule])
       setNewRule({
         type: 'redirect',
@@ -55,8 +61,10 @@ function OptionsApp() {
         priority: 1,
         enabled: true,
       })
+      console.log('Form reset')
     } catch (error) {
       console.error('Error adding rule:', error)
+      alert(`Error adding rule: ${error}`)
     }
   }
 
