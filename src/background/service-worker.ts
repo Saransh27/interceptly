@@ -1,3 +1,6 @@
+// Service worker loaded - log immediately
+console.log('[SERVICE WORKER] Script starting to load...')
+
 // Inline types and storage to avoid import issues in service worker
 interface InterceptRule {
   id: string
@@ -145,11 +148,8 @@ async function updateDeclarativeRules() {
                 'object',
                 'xmlhttprequest',
                 'ping',
-                'csp_report',
                 'media',
                 'websocket',
-                'webtransport',
-                'webbundle',
               ],
             },
             action: {
@@ -205,10 +205,12 @@ async function updateDeclarativeRules() {
   console.log(`[updateDeclarativeRules] Existing rules: ${existingRuleIds.length}`)
   
   try {
-    await chrome.declarativeNetRequest.updateSessionRules({
+    const result = await chrome.declarativeNetRequest.updateSessionRules({
       removeRuleIds: existingRuleIds.map(r => r.id),
       addRules: declarativeRules as any,
     })
+    
+    console.log('[updateDeclarativeRules] UpdateSessionRules result:', result)
     
     // Verify rules were added
     const updatedRuleIds = await chrome.declarativeNetRequest.getSessionRules()
@@ -216,8 +218,10 @@ async function updateDeclarativeRules() {
     updatedRuleIds.forEach(rule => {
       console.log(`  Active Rule ID ${rule.id}: Condition="${JSON.stringify(rule.condition)}"`)
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('[updateDeclarativeRules] Error updating rules:', error)
+    console.error('[updateDeclarativeRules] Error message:', error.message)
+    console.error('[updateDeclarativeRules] Error details:', JSON.stringify(error, null, 2))
   }
 }
 
@@ -294,4 +298,7 @@ chrome.declarativeNetRequest.onRuleMatchedDebug?.addListener((details) => {
   })
 })
 
-console.log('Interceptly background service worker loaded')
+console.log('[SERVICE WORKER] Interceptly background service worker fully loaded and ready!')
+console.log('[SERVICE WORKER] Storage listeners registered')
+console.log('[SERVICE WORKER] Message listeners registered')
+console.log('[SERVICE WORKER] Rule match debug listeners registered')
