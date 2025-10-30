@@ -5,6 +5,36 @@ import fs from 'fs'
 
 const __dirname = path.resolve()
 
+// Custom plugin to copy assets folder
+const copyAssetsPlugin = {
+  name: 'copy-assets',
+  apply: 'build' as const,
+  enforce: 'post' as const,
+  writeBundle() {
+    try {
+      const src = path.resolve(__dirname, 'src/assets')
+      const dest = path.resolve(__dirname, 'dist/assets')
+      
+      if (fs.existsSync(src)) {
+        // Create dist/assets if it doesn't exist
+        if (!fs.existsSync(dest)) {
+          fs.mkdirSync(dest, { recursive: true })
+        }
+        
+        // Copy all files from src/assets to dist/assets
+        fs.readdirSync(src).forEach(file => {
+          const srcFile = path.join(src, file)
+          const destFile = path.join(dest, file)
+          fs.copyFileSync(srcFile, destFile)
+        })
+        console.log('✓ assets folder copied to dist/')
+      }
+    } catch (err) {
+      console.error('✗ Error copying assets:', err)
+    }
+  },
+}
+
 // Custom plugin to copy manifest.json
 const copyManifestPlugin = {
   name: 'copy-manifest',
@@ -42,7 +72,7 @@ const copyManifestPlugin = {
 }
 
 export default defineConfig({
-  plugins: [react(), copyManifestPlugin],
+  plugins: [react(), copyAssetsPlugin, copyManifestPlugin],
   build: {
     outDir: 'dist',
     emptyOutDir: true,
